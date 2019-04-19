@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <script src="js/jquery-1.9.1.min.js"></script>
+
+    <script src="js/skin.js?t=201903161121"></script>
+    <link rel="stylesheet" href="css/orderList.css">
+    <link rel="stylesheet" href="css/crystalCommon.css">
+    <script src="js/common.js"></script>
+    <script>
+        linkScriptDOMLoaded(['orderList', 'crystalCommon']);
+
+    </script>
+    <style>
+        .item {
+            padding: 0.18rem 0;
+        }
+
+        p {
+            width: 100%;
+        }
+
+        .item > div:last-of-type > p {
+            display: block;
+        }
+
+        .item > div:last-of-type {
+            width: 1.5rem;
+            align-content: space-between;
+            height: 1.3rem;
+        }
+        .sale{
+            color:rgb(142,142,142);
+            text-align: right;
+            text-decoration: line-through;
+        }
+    </style>
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+
+
+    <script src="js/base.js"></script>
+    <script src="js/vue.js"></script>
+    <script src="js/vue-resource.min.js"></script>
+
+    <script src="js/layer/layer.js"></script>
+    <script src="js/current-device.min.js"></script>
+
+
+</head>
+<body>
+<div id='app' style="display: none">
+    <header>
+        <div class="back"></div>
+        <div class="title">我的订单</div>
+        <div class="dropList">
+            <div class="list dropNone">
+                <li>
+                    <a href="shop.html">商城首页</a>
+                </li>
+                <li>
+                    <a href="cart.html">购物车<span class="newsNum"></span></a>
+                </li>
+                <li>
+                    <a class="cartNews" href="message.html">消息</a>
+                </li>
+                <li>
+                    <a href="../VR/lubanchiZhengShi/html/index.html">试衣间</a>
+                </li>
+            </div>
+        </div>
+    </header>
+
+    <ul class='list1'>
+
+        <li :class="{'active1':currentView=='quanbu'}" @click="changeView('quanbu')">
+            <div></div>
+            全部
+        </li>
+        <li :class="{'active2':list1.pay>0,'active1':currentView=='fukuan'}" @click="changeView('fukuan')">
+            <div></div>
+            待付款
+        </li>
+        <li :class="{'active2':list1.ship>0,'active1':currentView=='fahuo'}" @click="changeView('fahuo')">
+            <div></div>
+            待发货
+        </li>
+        <li :class="{'active2':list1.receipt>0,'active1':currentView=='shouhuo'}" @click="changeView('shouhuo')">
+            <div></div>
+            待收货
+        </li>
+        <li :class="{'active2':list1.evaluate>0,'active1':currentView=='pingjia'}" @click="changeView('pingjia')">
+            <div></div>
+            待评价
+        </li>
+        <li :class="{'active2':list1.return>0,'active1':currentView=='return'}" @click="changeView('return')">
+            <div></div>
+            售后
+        </li>
+    </ul>
+    <div id="payBlock" class='conPay'>
+        <div class='titCon'>
+            <div class='tit'>确认付款</div>
+            <div class='close'></div>
+        </div>
+        <div class='money'
+             style="height: 1.5rem;color:rgb(255,1,104);font-size: 0.7rem;text-align: center;line-height: 1.5rem">
+            ￥<span>{{price}}</span>
+        </div>
+        <div class='orderNum'><span style="float: left;">订单编号：</span><span style="float: right;color: #999"
+                                                                           class="orderNo">{{orderNo}}</span>
+        </div>
+        <div class='payWay' style="display: none;" @click='payway'><span style="float: left;">支付方式：</span><span
+                class="paywayWord" style="float: right;">支付宝支付 ></span></div>
+        <div class='weiWay'><span style="float: left;">支付方式：</span><span style="float: right;">微信支付</span></div>
+        <div class='zhiWay'><span style="float: left;">支付方式：</span><span style="float: right;">支付宝支付</span></div>
+        <div id="pay" class='baseBtn red pay'>确认支付</div>
+    </div>
+    <div id="payWay" class='conPay'>
+        <div class='titCon' style="position: relative;">
+            <div class='tit' style="position: absolute;left:50%;transform:translateX(-50%);">选择支付方式</div>
+            <div class='bBack' @click='bBack'
+                 style="width: 0.7rem;height: 0.7rem;background: url(img/common/back.png)no-repeat;background-size: contain;position: absolute;left:0.1rem;"></div>
+        </div>
+        <div class='zhifubao choosepay active' data-value="1">
+            <div style="text-align: center;position: relative;">
+                <div style="width: 0.7rem;height: 0.7rem;background: url(img/orderList/zhifubao.png)no-repeat;background-size: contain;display: inline-block;vertical-align: middle;"></div>
+                <span style="margin-left: 0.1rem;display: inline-block;width: 1.5rem;">支付宝支付</span>
+                <div class="gou"></div>
+            </div>
+        </div>
+        <div class='weixin choosepay' data-value="2">
+            <div style="text-align: center;position: relative;">
+                <div style="width: 0.6rem;height: 0.6rem;background: url(img/orderList/wei.png)no-repeat;background-size: contain;display: inline-block;vertical-align: middle;"></div>
+                <span style="margin-left: 0.1rem;display: inline-block;width: 1.5rem;letter-spacing: 0.08rem">微信支付</span>
+                <div class='gou'></div>
+            </div>
+        </div>
+    </div>
+    <svg v-if='show' version="1.1" id="loader-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+   width="40px" height="40px" viewBox="0 0 40 40" enable-background="new 0 0 40 40" xml:space="preserve">
+  <path opacity="0.2" fill="#000" d="M20.201,5.169c-8.254,0-14.946,6.692-14.946,14.946c0,8.255,6.692,14.946,14.946,14.946
+    s14.946-6.691,14.946-14.946C35.146,11.861,28.455,5.169,20.201,5.169z M20.201,31.749c-6.425,0-11.634-5.208-11.634-11.634
+    c0-6.425,5.209-11.634,11.634-11.634c6.425,0,11.633,5.209,11.633,11.634C31.834,26.541,26.626,31.749,20.201,31.749z"/>
+  <path fill="#000" d="M26.013,10.047l1.654-2.866c-2.198-1.272-4.743-2.012-7.466-2.012h0v3.312h0
+    C22.32,8.481,24.301,9.057,26.013,10.047z">
+    <animateTransform attributeType="xml"
+      attributeName="transform"
+      type="rotate"
+      from="0 20 20"
+      to="360 20 20"
+      dur="0.5s"
+      repeatCount="indefinite"/>
+    </path>
+  </svg>
+    <div class='orderno' v-if='show1'>您还没有相关的订单</div>
+    <div class="mask"></div>
+    <div class="code"></div>
+    <component :is='currentView'></component>
+
+
+</div>
+<!-- 代付款 -->
+<template id='fukuanCon'>
+    <div>
+        <div class='itemList' v-for='item in list'>
+
+            <div class='titCon'>
+                <div class='tit'>{{item.itemlist[0].brand_name}}</div>
+                <span class='status'>待付款</span>
+            </div>
+            <div class='info'>
+                <div class='item' v-for='item1 in item.itemlist' @click='transform(item.orders_id)'>
+                    <img style="float: left;" :src='item1.list_img_uri' width="75" alt="">
+                    <div style="float: left;margin-left: 0.26rem;width: 3rem;">
+                        <p style="color:black;text-overflow:ellipsis;width: 3rem;overflow: hidden;white-space:nowrap">
+                            <span v-if="item1.commodity_type==1" style="color:rgb(255,1,104)"><套装></span>{{item1.item_name}}
+
+                        </p>
+
+                        <div v-if="item1.commodity_type==0" style="margin-top: 0.288rem;color:rgb(142,142,142)"><span>{{item1.color}}</span><span
+                                style="margin-left: 0.144rem">{{item1.mater}}</span><span style="margin-left: 0.144rem">{{item1.pattern}}</span>
+                        </div>
+                        <div style="width: 3.2rem">
+                            <div v-for="item2 in item1.sub_list" style="margin-top: 0.1rem">
+                                <span>{{item2.name}}</span><span style="float: right">{{item2.size_name}}</span></div>
+                        </div>
+                    </div>
+                    <div style="float: right;display: flex;flex-wrap: wrap;">
+                        <p style='color:rgb(255,1,104);text-align: right;'>￥{{item1.sale_price}}</p>
+                        <p v-if="item1.online_price!=item1.sale_price" class="sale">
+                            ￥{{item1.online_price}}</p>
+                        <p style="text-align: right;color: rgb(142, 142, 142);">{{item1.size_name}}</p>
+                        <p style="color:rgb(142,142,142);text-align: right;">×
+                            {{item1.quantity}}</p>
+                    </div>
+                </div>
+
+                <div class='infoBt '>
+
+                    <div v-if='item.point_amount!=0'>已使用商城积分抵扣<span
+                            style="color:rgb(255,1,105)"> {{item.point_amount}} </span>元
+                    </div>
+                    <p style="margin-top: 0.144rem">共{{item.item_total}}件商品 合计：<span style="color:rgb(255,1,105)"> ￥{{item.pay_amount}} </span>
+                    </p>
+
+                    <div id='goumai' @click='zhifu(item.orders_id,item.pay_amount,item.order_no)'>去支付</div>
+                    <div id='goumai1' @click='cancel(item.orders_id)'>取消订单</div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+<!-- 代付款 -->
+<!-- 待发货 -->
+<template id='fahuoCon'>
+    <div>
+        <div class='itemList' v-for='item in list'>
+
+            <div class='titCon'>
+                <div class='tit'>{{item.itemlist[0].brand_name}}</div>
+                <span class='status'>待发货</span>
+            </div>
+            <div class='info'>
+                <div class='item' v-for='item1 in item.itemlist' @click='transform(item.orders_id)'>
+                    <img style="float: left;" :src='item1.list_img_uri' width="75" alt="">
+                    <div style="float: left;margin-left: 0.26rem;width: 3rem;">
+                        <p style="color:black;text-overflow:ellipsis;width: 3rem;overflow: hidden;white-space:nowrap">
+                            <span v-if="item1.commodity_type==1" style="color:rgb(255,1,104)"><套装></span>{{item1.item_name}}
+                        </p>
+
+                        <div v-if="item1.commodity_type==0" style="margin-top: 0.288rem;color:rgb(142,142,142)"><span>{{item1.color}}</span><span
+                                style="margin-left: 0.144rem">{{item1.mater}}</span><span style="margin-left: 0.144rem">{{item1.pattern}}</span>
+                        </div>
+                        <div style="width: 3.2rem">
+                            <div v-for="item2 in item1.sub_list" style="margin-top: 0.1rem">
+                                <span>{{item2.name}}</span><span style="float: right">{{item2.size_name}}</span></div>
+                        </div>
+                    </div>
+                    <div style="float: right;display: flex;flex-wrap: wrap;">
+                        <p style='color:rgb(255,1,104);text-align: right;'>￥{{item1.sale_price}}</p>
+                        <p v-if="item1.online_price!=item1.sale_price" class="sale">
+                            ￥{{item1.online_price}}</p>
+                        <p style="text-align: right;color:rgb(142,142,142);">{{item1.size_name}}</p>
+                        <p style="color:rgb(142,142,142);text-align: right;">×
+                            {{item1.quantity}}</p>
+                    </div>
+
+
+                </div>
+                <div class='infoBt' style="float: right;">
+
+                    <div v-if='item.point_amount!=0'>已使用商城积分抵扣<span
+                            style="color:rgb(255,1,105)"> {{item.point_amount}} </span>元
+                    </div>
+                    <p style="margin-top: 0.144rem">共{{item.item_total}}件商品 合计：<span style="color:rgb(255,1,105)"> ￥{{item.pay_amount}} </span>
+                    </p>
+                    <div id='goumai' @click='transform(item.orders_id)'>等待发货</div>
+
+                </div>
+            </div>
+        </div>
+</template>
+<!-- 待发货 -->
+
+<!-- 待收货 -->
+<template id='shouhuoCon'>
+    <div>
+        <div class='itemList' v-for='item in list'>
+
+            <div class='titCon'>
+                <div class='tit'>{{item.itemlist[0].brand_name}}</div>
+                <span class='status'>待收货</span>
+            </div>
+            <div class='info'>
+                <div class='item' v-for='item1 in item.itemlist' @click='transform(item.orders_id)'>
+                    <img style="float: left;" :src='item1.list_img_uri' width="75" alt="">
+                    <div style="float: left;margin-left: 0.26rem;width: 3rem;">
+                        <p style="color:black;text-overflow:ellipsis;width: 3rem;overflow: hidden;white-space:nowrap">
+                            <span v-if="item1.commodity_type==1" style="color:rgb(255,1,104)"><套装></span>{{item1.item_name}}
+                        </p>
+
+                        <div v-if="item1.commodity_type==0" style="margin-top: 0.288rem;color:rgb(142,142,142)"><span>{{item1.color}}</span><span
+                                style="margin-left: 0.144rem">{{item1.mater}}</span><span style="margin-left: 0.144rem">{{item1.pattern}}</span>
+                        </div>
+                        <div style="width: 3.2rem">
+                            <div v-for="item2 in item1.sub_list" style="margin-top: 0.1rem">
+                                <span>{{item2.name}}</span><span style="float: right">{{item2.size_name}}</span></div>
+                        </div>
+                    </div>
+                    <div style="float: right;display: flex;flex-wrap: wrap;">
+
+                        <p style='color:rgb(255,1,104);text-align: right;'>￥{{item1.sale_price}}</p>
+                        <p v-if="item1.online_price!=item1.sale_price" class="sale">
+                            ￥{{item1.online_price}}</p>
+                        <p style="text-align: right;color:rgb(142,142,142);">{{item1.size_name}}</p>
+                        <p style="color:rgb(142,142,142);text-align: right;">×
+                            {{item1.quantity}}</p>
+                    </div>
+
+
+                </div>
+                <div class='infoBt '>
+                    <div v-if='item.point_amount!=0'>已使用商城积分抵扣<span
+                            style="color:rgb(255,1,105)"> {{item.point_amount}} </span>元
+                    </div>
+                    <p style="margin-top: 0.144rem">共{{item.item_total}}件商品 合计：<span style="color:rgb(255,1,105)"> ￥{{item.pay_amount}} </span>
+                    </p>
+                    <div id='goumai' @click='shouhuo(item.orders_id)'>确认收货</div>
+                    <div id='wuliu' @click='wuliu(item.orders_id)'>查看物流</div>
+
+                </div>
+            </div>
+        </div>
+</template>
+<!-- 待收货 -->
+
+<!-- 待评价 -->
+<template id='pingjiaCon'>
+    <div>
+        <div class='itemList' v-for='item in list'>
+
+            <div class='titCon'>
+                <div class='tit'>{{item.itemlist[0].brand_name}}</div>
+                <span class='status'>待评价</span>
+            </div>
+            <div class='info'>
+                <div class='item' v-for='item1 in item.itemlist' @click='transform(item.orders_id)'>
+                    <img style="float: left;" :src='item1.list_img_uri' width="75" alt="">
+                    <div style="float: left;margin-left: 0.26rem;width: 3rem;">
+                        <p style="color:black;text-overflow:ellipsis;width: 3rem;overflow: hidden;white-space:nowrap">
+                            <span v-if="item1.commodity_type==1" style="color:rgb(255,1,104)"><套装></span>{{item1.item_name}}
+                        </p>
+
+                        <div v-if="item1.commodity_type==0" style="margin-top: 0.288rem;color:rgb(142,142,142)"><span>{{item1.color}}</span><span
+                                style="margin-left: 0.144rem">{{item1.mater}}</span><span style="margin-left: 0.144rem">{{item1.pattern}}</span>
+                        </div>
+                        <div style="width: 3.2rem">
+                            <div v-for="item2 in item1.sub_list" style="margin-top: 0.1rem">
+                                <span>{{item2.name}}</span><span style="float: right">{{item2.size_name}}</span></div>
+                        </div>
+                    </div>
+                    <div style="float: right;display: flex;flex-wrap: wrap;">
+
+                        <p style='color:rgb(255,1,104);text-align: right;'>￥{{item1.sale_price}}</p>
+                        <p v-if="item1.online_price!=item1.sale_price" class="sale">
+                            ￥{{item1.online_price}}</p>
+                        <p style="text-align: right;color:rgb(142,142,142);">{{item1.size_name}}</p>
+                        <p style="color:rgb(142,142,142);text-align: right;">×
+                            {{item1.quantity}}</p>
+                    </div>
+
+
+                </div>
+                <div class='infoBt '>
+
+                    <div v-if='item.point_amount!=0'>已使用商城积分抵扣<span
+                            style="color:rgb(255,1,105)"> {{item.point_amount}} </span>元
+                    </div>
+                    <p style="margin-top: 0.144rem">共{{item.item_total}}件商品 合计：<span style="color:rgb(255,1,105)"> ￥{{item.pay_amount}} </span>
+                    </p>
+                    <div id='goumai' @click='pingjia(item.orders_id)'>评价</div>
+                    <div id='wuliu' @click='wuliu(item.orders_id)'>查看物流</div>
+
+                </div>
+            </div>
+        </div>
+</template>
+<!-- 待评价 -->
+
+<!-- 退换货 -->
+<template id='returnCon'>
+    <div>
+        <div class='itemList' v-for='item in list'>
+
+            <div class='titCon'>
+                <div class='tit'>{{item.brand_name}}</div>
+                <p style="color:rgb(255,1,105);text-align: right;">{{item.status1}}</p>
+            </div>
+            <div class='info'>
+                <div class='item' @click='transform(item.refund_status,item.orders_refund_id,item.type)'
+                     style="position: relative;height: 2.2rem">
+                    <img style="float: left;" :src='item.list_img_uri' width="75" alt="">
+                    <div style="float: left;margin-left: 0.26rem;width: 3rem;">
+                        <p style="color:black;text-overflow:ellipsis;width: 3rem;overflow: hidden;white-space:nowrap">
+                            <span v-if="item.commodity_type==1" style="color:rgb(255,1,104)"><套装></span>{{item.name}}
+                        </p>
+
+                        <div v-if="item.commodity_type==0" style="margin-top: 0.288rem;color:rgb(142,142,142)"><span>{{item.color}}</span><span
+                                style="margin-left: 0.144rem">{{item.mater}}</span><span style="margin-left: 0.144rem">{{item.pattern}}</span>
+                        </div>
+                        <div style="width: 3.2rem">
+                            <div v-for="item2 in item.sub_list" style="margin-top: 0.1rem">
+                                <span>{{item2.name}}</span><span style="float: right">{{item2.size_name}}</span></div>
+                        </div>
+                    </div>
+                    <div style="float: right;">
+
+                        <p style='color:rgb(255,1,104);text-align: right;'>￥{{item.sale_price}}</p>
+                        <p v-if="item.online_price!=item.sale_price" class="sale">
+                            ￥{{item.online_price}}</p>
+                        <p style="text-align: right;color:rgb(142,142,142);">{{item.size_name}}</p>
+                        <p style="color:rgb(142,142,142);text-align: right;margin-top: 0.7rem">×
+                            {{item.quantity}}</p>
+                    </div>
+                    <div id='wuliu' @click='detail(item.refund_status,item.orders_refund_id,item.type)'
+                         style="margin-right: -0.1rem;position: absolute;bottom:0;right: 0.1rem">查看详情
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+    </div>
+</template>
+<!-- 退换货 -->
+<!-- 全部 -->
+<template id='quanbuCon'>
+    <div>
+        <div class='itemList' v-for='item in list'>
+
+            <div class='titCon'>
+                <div class='tit'>{{item.itemlist[0].brand_name}}</div>
+                <span class='status'>{{item.status1}}</span>
+            </div>
+            <div class='info'>
+                <div class='item' v-for='item1 in item.itemlist' @click='transform(item.orders_id)'>
+                    <img style="float: left;" :src='item1.list_img_uri' width="75" alt="">
+                    <div style="float: left;margin-left: 0.26rem;width: 3rem;">
+                        <p style="color:black;text-overflow:ellipsis;width: 3rem;overflow: hidden;white-space:nowrap">
+                            <span v-if="item1.commodity_type==1" style="color:rgb(255,1,104)"><套装></span>{{item1.item_name}}
+                        </p>
+
+                        <div v-if="item1.commodity_type==0" style="margin-top: 0.288rem;color:rgb(142,142,142)"><span>{{item1.color}}</span><span
+                                style="margin-left: 0.144rem">{{item1.mater}}</span><span style="margin-left: 0.144rem">{{item1.pattern}}</span>
+                        </div>
+                        <div style="width: 3.2rem">
+                            <div v-for="item2 in item1.sub_list" style="margin-top: 0.1rem">
+                                <span>{{item2.name}}</span><span style="float: right">{{item2.size_name}}</span></div>
+                        </div>
+                    </div>
+                    <div style="float: right;display: flex;flex-wrap: wrap;">
+
+                        <p style='color:rgb(255,1,104);text-align: right;'>￥{{item1.sale_price}}</p>
+                        <p v-if="item1.online_price!=item1.sale_price" class="sale">
+                            ￥{{item1.online_price}}</p>
+                        <p style="text-align: right;color:rgb(142,142,142);">{{item1.size}}</p>
+                        <p style="color:rgb(142,142,142);text-align: right;">×
+                            {{item1.quantity}}</p>
+                    </div>
+
+                </div>
+
+                <div class='infoBt '>
+
+                    <div v-if='item.point_amount!=0'>已使用商城积分抵扣<span
+                            style="color:rgb(255,1,105)"> {{item.point_amount}} </span>元
+                    </div>
+                    <p style="margin-top: 0.144rem">共{{item.item_total}}件商品 合计：<span style="color:rgb(255,1,105)"> ￥{{item.pay_amount}} </span>
+                    </p>
+
+                    <div v-if='item.status=="receipt"'>
+                        <div id='goumai' @click='shouhuo(item.orders_id)'>确认收货</div>
+                        <div id='wuliu' @click='wuliu(item.orders_id)'>查看物流</div>
+                    </div>
+                    <div v-if='item.status=="return"'>
+                        <div id='wuliu' @click='detail(item.orders_id,item.orders_refund_id)'
+                             style="margin-right: -0.1rem">查看详情
+                        </div>
+                    </div>
+                    <div v-if='item.status=="evaluate"'>
+                        <div id='goumai' @click='pingjia(item.orders_id)'>评价</div>
+                        <div id='wuliu' @click='wuliu(item.orders_id)'>查看物流</div>
+                    </div>
+                    <div v-if='item.status=="complete"'>
+
+                        <div id='wuliu' @click='wuliu(item.orders_id)' style='margin-right: -0.1rem'>查看物流</div>
+                    </div>
+                    <div v-if='item.status=="cancel"||item.status=="close"||item.status=="timeout"'>
+                        <div id='goumai' @click='delete1(item.orders_id)'>删除订单</div>
+                    </div>
+                    <div v-if='item.status=="ship"'>
+                        <div id='goumai' @click='transform(item.orders_id)'>等待发货</div>
+                    </div>
+                    <div v-if='item.status=="pay"'>
+                        <div id='goumai' @click='zhifu(item.orders_id,item.pay_amount,item.order_no)'>去支付</div>
+                        <div id='goumai1' @click='cancel(item.orders_id)'>取消订单</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+<!-- 全部 -->
+</body>
+<script src='js/orderList.js'>
+
+</script>
+<script src="js/common.js"></script>
+</html>

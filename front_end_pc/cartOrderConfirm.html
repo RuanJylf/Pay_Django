@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8">
+		<title>确认订单</title>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="format-detection" content="telephone=no">
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+		<!--<link href="css/crystalCommon.css" rel="stylesheet" />
+		<link href="css/cartOrderConfirm.css" rel="stylesheet" />-->
+		<script src="js/skin.js?t=201903161121"></script>
+		<script>
+			linkScriptDOMLoaded([
+				"crystalCommon",
+				"cartOrderConfirm"
+			]);
+		</script>
+	</head>
+
+	<body>
+		<header>
+			<div class="back"></div>
+			<div class="title">确认订单</div>
+			<div class="dropList">
+				<div class="list dropNone">
+					<li>
+						<a href="shop.html">商城首页</a>
+					</li>
+					<li>
+						<a href="cart.html">购物车</a>
+					</li>
+					<li>
+						<a class="cartNews">消息<span class="newsNum"></span></a>
+					</li>
+					<li>
+						<a href="../VR/lubanchiZhengShi/html/index.html">试衣间</a>
+					</li>
+				</div>
+			</div>
+		</header>
+		<div id="openAddress" class="block">
+			<div class='spanPosition'></div>
+			<div class='userBlock'>
+				<div class="user">
+					<div>收货人 : <span class="usename">无</span></div>
+					<div class="phone">无</div>
+				</div>
+				<div>收货地址：<span class="address">无</span></div>
+			</div>
+			<div class="new">+ 添加新地址</div>
+			<div class="spanRight"></div>
+		</div>
+		<div class="itemList">
+			<!--<div class='itemLi'>
+        <div class='titCon'>
+            <div class='tit'>帝诺雷斯旗舰店 ></div>
+        </div>
+        <div class='info'>
+            <div class="infoLeft">
+                <img src="img/renwu_1.png">
+            </div>
+            <div class="infoMid">
+                <div class="itemName">21313142341231312222222222222222222222222222222222222213</div>
+                <div class="itemTexture">黑色 纯棉 拼花拼色</div>
+            </div>
+            <div class="infoRight">
+                <div>
+                    <div class="current">￥<span>118.00</span></div>
+                    <div class="original">￥<span>242.00</span></div>
+                </div>
+                <div class="num">x<span>1</span></div>
+            </div>
+
+        </div>
+        <div class='info'>
+            <div class="infoLeft">
+                <img src="img/renwu_1.png">
+            </div>
+            <div class="infoMid">
+                <div class="itemName">21313142341231312222222222222222222222222222222222222213</div>
+                <div class="itemTexture">黑色 纯棉 拼花拼色</div>
+            </div>
+            <div class="infoRight">
+                <div>
+                    <div class="current">￥<span>118.00</span></div>
+                    <div class="original">￥<span>242.00</span></div>
+                </div>
+                <div class="num">x<span>1</span></div>
+            </div>
+
+        </div>
+    </div>-->
+		</div>
+		<div class="titCon" style="text-align: center;">如需发票，请联系客服</div>
+		<div class='infoBt'>
+			<div class="orderHide" style="display: none">
+				<div>可用商城积分抵扣 <span class="point">0.00</span> 元</div>
+				<div id="check1" class="check"></div>
+			</div>
+			<!--<div>
+        <div>可用 <span class="commission">0.00</span> 元佣金抵扣</div>
+        <div id="check2" class="check"></div>
+    </div>-->
+			<div>共<span class="totalNum">0</span>件商品 合计：<span>￥<span class="price">0.00</span></span>
+			</div>
+			<div>
+				<div id="confirm" class="baseBtn red confirm">确认订单</div>
+			</div>
+
+		</div>
+		<div id="payBlock" class='conPay'>
+			<div class='titCon'>
+				<div class='tit'>确认付款</div>
+				<div class='close'></div>
+			</div>
+			<div class='money' style="height: 1.5rem;color:rgb(255,1,104);font-size: 0.7rem;text-align: center;line-height: 1.5rem">￥<span>0.00</span>
+			</div>
+			<div class='orderNum'><span style="float: left;">订单编号：</span><span style="float: right;color: #999" class="orderNo">00000000</span>
+			</div>
+			<div class='payWay'><span style="float: left;">支付方式：</span><span class="paywayWord" style="float: right;">支付宝支付></span></div>
+			<div class='weiWay'><span style="float: left;">支付方式：</span><span style="float: right;">微信支付</span></div>
+			<div class='zhiWay'><span style="float: left;">支付方式：</span><span style="float: right;">支付宝支付</span></div>
+			<div id="pay" class='baseBtn red pay'>确认支付</div>
+		</div>
+		 <div id="payWay" class='conPay'>
+			<div class='titCon' style="position: relative;">
+				<div class='tit' style="position: absolute;left:50%;transform:translateX(-50%);">选择支付方式</div>
+				<div class='bBack'></div>
+			</div>
+			<div class='zhifubao choosepay active' data-value="1">
+				<div style="text-align: center;position: relative;">
+					<div style="width: 0.7rem;height: 0.7rem;background: url(img/orderConfirm/zhifubao.png)no-repeat;background-size: contain;display: inline-block;vertical-align: middle;"></div>
+					<span style="margin-left: 0.1rem;display: inline-block;width: 1.5rem;">支付宝支付</span>
+					<div class="gou"></div>
+				</div>
+			</div>
+			<div class='weixin choosepay' data-value="2">
+				<div style="text-align: center;position: relative;">
+					<div style="width: 0.6rem;height: 0.6rem;background: url(img/orderConfirm/wei.png)no-repeat;background-size: contain;display: inline-block;vertical-align: middle;"></div>
+					<span style="margin-left: 0.1rem;display: inline-block;width: 1.5rem;letter-spacing: 0.08rem">微信支付</span>
+					<div class='gou'></div>
+				</div>
+			</div>
+		</div>
+		<!--弹框提示-->
+		<div class="pop" style="display: block;">
+			<div class="popBox">
+				<div class="popWord">您的订单属于高级定制，一经确认，<br>无法进行退款退货，请耐心等待哦！</div>
+				<div class="baseBtn red popBtn">确认</div>
+			</div>
+		</div>
+		<div class="pop">
+			<div class="popBox">
+				<div class="popWord">请刷新页面</div>
+				<div class="baseBtn red popBtn">确认</div>
+			</div>
+		</div>
+		<div class="mask"></div>
+		<div class="code"></div>
+		<div class="addressMask">
+			<iframe src="cartAddressList.html"></iframe>
+		</div>
+		<script src="js/jquery-3.1.1.min.js"></script>
+		<script src="js/common.js"></script>
+		<script src="js/current-device.min.js"></script>
+		<script src="js/cartOrderConfirm.js?t=201903161121"></script>
+	</body>
+
+</html>
