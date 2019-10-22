@@ -8,7 +8,7 @@ djangorestframework==3.9.2
 idna==2.8
 image==1.5.27
 mysqlclient==1.4.2.post1
-Pillow==6.0.0
+Pillow==6.2.0
 pycryptodomex==3.7.2
 PyMySQL==0.9.3
 python-alipay-sdk==1.10.0
