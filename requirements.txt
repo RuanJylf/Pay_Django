@@ -4,7 +4,7 @@ certifi==2019.3.9
 chardet==3.0.4
 Django==2.1.7
 django-cors-headers==2.5.2
-djangorestframework==3.9.2
+djangorestframework==3.11.2
 idna==2.8
 image==1.5.27
 mysqlclient==1.4.2.post1
